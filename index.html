@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Suni Sentani - Kenyamanan Modern di Tepi Danau</title>
+
+    <!-- Favicon Tags -->
+    <link rel="icon" type="image/x-icon" href="./img/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/favicon.png">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js CDN -->
@@ -28,14 +35,48 @@
             }
         }
     </script>
+
+    
+    <style>
+    @keyframes zoomPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+    .animate-zoomPulse {
+        animation: zoomPulse 10s infinite ease-in-out;
+    }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased" x-data="{ mobileMenu: false }">
 
+    
+    
     <!-- TOP HEADER / NAVBAR -->
-    <header class="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/70 via-black/40 to-transparent">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-3">
+    <header x-data="{ 
+        mobileMenu: false, 
+        lang: 'en',
+        scrolled: false,
+        toggleLang() {
+            this.lang = this.lang === 'en' ? 'id' : 'en';
+        },
+        menuItems: [
+            { href: '#beranda', en: 'HOME', id: 'BERANDA' },
+            { href: '#kamar', en: 'ROOMS & SUITES', id: 'KAMAR' },
+            { href: '#meeting', en: 'MEETING & EVENTS', id: 'RAPAT & ACARA' },
+            { href: '#paket', en: 'SPECIAL OFFERS', id: 'PENAWARAN KHUSUS' },
+            { href: '#fasilitas', en: 'FACILITIES & SERVICES', id: 'FASILITAS & LAYANAN' },
+            { href: '#interest', en: 'INTEREST', id: 'MENARIK' }
+        ]
+    }" 
+    @scroll.window="scrolled = (window.pageYOffset > 30)"
+    :class="scrolled ? 'fixed top-0 left-0 right-0 bg-suniDarker/95 backdrop-blur-md shadow-lg py-3' : 'absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent py-4'"
+    class="z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between lg:h-20">
+            
+            <!-- ================= DESKTOP VIEW ================= -->
+            <!-- Logo Desktop -->
+            <div class="hidden lg:flex items-center space-x-3">
                 <a href="#beranda" class="flex items-center">
                     <img src="./img/logo2.png" alt="Hotel Suni Sentani Logo" class="h-12 w-auto object-contain">
                 </a>
@@ -43,470 +84,565 @@
 
             <!-- Desktop Navigation -->
             <nav class="hidden lg:flex items-center space-x-8 text-sm font-semibold text-white">
-                <a href="#beranda" class="text-suniGold border-b-2 border-suniGold pb-1">BERANDA</a>
-                <a href="#kamar" class="hover:text-suniGold transition">KAMAR</a>
-                <a href="#fasilitas" class="hover:text-suniGold transition">FASILITAS</a>
-                <a href="#paket" class="hover:text-suniGold transition">PAKET</a>
-                <a href="#galeri" class="hover:text-suniGold transition">GALERI</a>
-                <a href="#tentang" class="hover:text-suniGold transition">TENTANG KAMI</a>
-                <a href="#kontak" class="hover:text-suniGold transition">KONTAK</a>
+                <template x-for="(item, index) in menuItems" :key="index">
+                    <a :href="item.href" 
+                    :class="index === 0 ? 'text-suniGold border-b-2 border-suniGold pb-1' : 'hover:text-suniGold transition'"
+                    x-text="lang === 'en' ? item.en : item.id">
+                    </a>
+                </template>
             </nav>
 
-            <!-- Right Action (Language & CTA) -->
+            <!-- Right Action Desktop (Language Switcher & CTA) -->
             <div class="hidden lg:flex items-center space-x-4">
-                <button class="flex items-center space-x-1 text-white text-sm bg-black/30 px-2.5 py-1 rounded border border-white/20">
-                    <span>🇮🇩</span>
-                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                <button @click="toggleLang()" class="flex items-center space-x-1.5 text-white text-sm bg-black/30 px-3 py-1.5 rounded border border-white/20 hover:bg-black/50 transition">
+                    <span x-text="lang === 'en' ? '🇬🇧 EN' : '🇮🇩 ID'"></span>
                 </button>
-                <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold px-5 py-2.5 rounded text-sm transition shadow-lg">
-                    RESERVASI SEKARANG
+                <a href="#kontak" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold px-5 py-2.5 rounded text-sm transition shadow-lg" x-text="lang === 'en' ? 'CONTACT' : 'KONTAK'">
                 </a>
             </div>
 
-            <!-- Mobile Menu Button -->
-            <div class="lg:hidden flex items-center space-x-3">
-                <button @click="mobileMenu = !mobileMenu" class="text-white text-2xl focus:outline-none">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+
+            <!-- ================= MOBILE VIEW ================= -->
+            <!-- Mobile Header Layout: Logo di Tengah, Hamburger di Kanan -->
+            <div class="lg:hidden w-full flex items-center justify-between">
+                <!-- Spacer kosong untuk menyeimbangkan posisi logo agar benar-benar di tengah -->
+                <div class="w-8"></div>
+
+                <!-- Logo Utama di Tengah (Diperbaiki path dan ukuran tingginya) -->
+                <div class="flex items-center justify-center">
+                    <a href="#beranda" class="flex items-center">
+                        <img src="./img/logo2.png" alt="Hotel Suni Sentani Logo" class="h-10 w-auto object-contain">
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex items-center justify-end w-8">
+                    <button @click="mobileMenu = !mobileMenu" class="text-white text-2xl focus:outline-none">
+                        <i class="fa-solid fa-bars" x-show="!mobileMenu"></i>
+                        <i class="fa-solid fa-xmark" x-show="mobileMenu"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Mobile Navigation Menu -->
-        <div x-show="mobileMenu" class="lg:hidden bg-suniDarker/95 backdrop-blur-md px-6 py-6 border-t border-gray-800 text-white space-y-4">
-            <a href="#beranda" class="block hover:text-suniGold">BERANDA</a>
-            <a href="#kamar" class="block hover:text-suniGold">KAMAR</a>
-            <a href="#fasilitas" class="block hover:text-suniGold">FASILITAS</a>
-            <a href="#paket" class="block hover:text-suniGold">PAKET</a>
-            <a href="#galeri" class="block hover:text-suniGold">GALERI</a>
-            <a href="#tentang" class="block hover:text-suniGold">TENTANG KAMI</a>
-            <a href="#kontak" class="block hover:text-suniGold">KONTAK</a>
+        <!-- Mobile Navigation Menu (Posisi di Bawah Logo dengan Rata Tengah) -->
+        <div x-show="mobileMenu" x-transition class="lg:hidden bg-suniDarker/95 backdrop-blur-md px-6 py-6 border-t border-gray-800 text-white text-center space-y-4 shadow-2xl">
+            <template x-for="item in menuItems">
+                <a :href="item.href" @click="mobileMenu = false" class="block py-1 hover:text-suniGold transition text-base font-medium" x-text="lang === 'en' ? item.en : item.id"></a>
+            </template>
+            
             <div class="pt-4 border-t border-gray-800 flex flex-col space-y-3">
-                <a href="#reservasi" class="bg-suniGold text-suniDarker text-center font-bold py-2.5 rounded">RESERVASI SEKARANG</a>
+                <!-- Mobile Language Toggle -->
+                <button @click="toggleLang()" class="flex items-center justify-center space-x-2 text-white text-sm bg-black/40 py-2.5 rounded border border-white/20 w-full">
+                    <span x-text="lang === 'en' ? '🇬🇧 Switch to Bahasa Indonesia' : '🇮🇩 Ganti ke English'"></span>
+                </button>
+                <a href="#kontak" @click="mobileMenu = false" class="bg-suniGold text-suniDarker text-center font-bold py-2.5 rounded w-full shadow-md" x-text="lang === 'en' ? 'CONTACT' : 'KONTAK'"></a>
             </div>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section id="beranda" class="relative min-h-[90vh] flex items-end justify-center bg-cover bg-center pb-16 pt-32" style="background-image: url('./img/hero/Suni\ Sentani\ -\ Presentation.jpg');">
+
+
+    <!-- HERO SECTION DENGAN BACKGROUND SLIDER & EFEK ZOOM -->
+    <section id="beranda" 
+        x-data="{
+            activeSlide: 0,
+            bgImages: [
+                './img/hero1/bg-ai-1.png',
+                './img/hero1/bg-ai-3.png',
+                './img/hero1/bg-ai-2.png'
+            ],
+            init() {
+                setInterval(() => {
+                    this.activeSlide = (this.activeSlide + 1) % this.bgImages.length;
+                }, 5000); // Ganti slide setiap 5 detik
+            }
+        }" 
+        class="relative min-h-[90vh] lg:min-h-[85vh] flex items-end justify-center overflow-hidden pb-16 pt-32">
         
+        <!-- Background Slideshow dengan Efek Zoom In / Zoom Out -->
+        <template x-for="(img, index) in bgImages" :key="index">
+            <div x-show="activeSlide === index"
+                x-transition:enter="transition-opacity duration-1000 ease-in-out"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity duration-1000 ease-in-out"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute inset-0 bg-cover bg-bottom w-full h-full z-0 animate-zoomPulse"
+                :style="'background-image: url(' + img + ');'">
+            </div>
+        </template>
+
+        <!-- Dark Gradient Overlay untuk kontras -->
+        <div class="absolute inset-0 bg-black/10 z-1 pointer-events-none"></div>
+
+        <!-- Container Utama untuk Gambar Posisi Kiri & Kanan -->
+        <div class="absolute inset-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end justify-between pointer-events-none z-10">
+            
+            <!-- Papuan Model (Posisi Kiri) - Ubah nilai style height (px) sesuai keinginan -->
+            <div class="h-full flex items-end justify-start">
+                <img src="./img/hero1/papuan-model.png" alt="Papuan Model" style="height: 600px;" class="w-auto object-contain object-bottom drop-shadow-2xl">
+            </div>
+
+            <!-- Logo (Posisi Kanan Middle) - Ubah nilai style width (px) sesuai keinginan -->
+            <div class="absolute right-4 sm:right-8 lg:right-16 top-1/2 -translate-y-1/2 flex items-center justify-end">
+                <img src="./img/hero1/logo.png" alt="Hotel Logo" style="width: 450px;" class="h-auto object-contain drop-shadow-lg opacity-90">
+            </div>
+
+        </div>
     </section>
 
-    <!-- BOOKING BAR WIDGET -->
+
+   
+    
+    
+    
+
+
+
+    <!-- PARENT WRAPPER DENGAN ALPINE.JS STATE GLOBAL UNTUK KONTROL VISIBILITAS SECTION -->
+<div x-data="{
+    selectedCategory: 'Rooms & Suites',
+    openDropdown: false,
+    categories: [
+        { name: 'Rooms & Suites', target: 'rooms' },
+        { name: 'Meeting & Events', target: 'meeting' },
+        { name: 'Special Offers', target: 'packages' },
+        { name: 'Facilities & Services', target: 'facilities' }
+    ],
+    searchQuery: '',
+    handleSearch() {
+        alert('Searching for Category: ' + this.selectedCategory + ' | Keyword: ' + (this.searchQuery || 'All'));
+    }
+}">
+
+    <!-- SEARCH BAR WIDGET -->
     <div class="max-w-6xl mx-auto px-4 -mt-10 relative z-20">
-        <div class="bg-suniDarker text-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-center">
-            <!-- Check-in -->
-            <div class="border border-gray-700 bg-black/40 p-3 rounded-lg">
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1">Check-In</label>
-                <div class="flex items-center justify-between text-sm font-semibold">
-                    <span>21 Mei 2026</span>
-                    <i class="fa-regular fa-calendar text-suniGold"></i>
+        <div class="bg-suniDarker text-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+            
+            <!-- Kategori Dropdown -->
+            <div class="border border-gray-700 bg-black/40 p-4 rounded-lg relative">
+                <div @click="openDropdown = !openDropdown" class="flex items-center justify-between text-sm font-semibold cursor-pointer select-none">
+                    <span x-text="selectedCategory"></span>
+                    <i class="fa-solid fa-chevron-down text-xs text-suniGold transition-transform" :class="openDropdown ? 'rotate-180' : ''"></i>
+                </div>
+                
+                <!-- Dropdown Menu dari Array -->
+                <div x-show="openDropdown" 
+                    @click.outside="openDropdown = false"
+                    x-transition 
+                    class="absolute left-0 right-0 top-full mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-30">
+                    <template x-for="cat in categories">
+                        <div @click="selectedCategory = cat.name; openDropdown = false" 
+                            class="px-4 py-2.5 text-sm hover:bg-suniGold hover:text-suniDarker cursor-pointer transition"
+                            x-text="cat.name">
+                        </div>
+                    </template>
                 </div>
             </div>
-            <!-- Check-out -->
-            <div class="border border-gray-700 bg-black/40 p-3 rounded-lg">
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1">Check-Out</label>
+
+            <!-- Keyword Input Search -->
+            <div class="border border-gray-700 bg-black/40 p-4 rounded-lg lg:col-span-2">
                 <div class="flex items-center justify-between text-sm font-semibold">
-                    <span>22 Mei 2026</span>
-                    <i class="fa-regular fa-calendar text-suniGold"></i>
+                    <input type="text" x-model="searchQuery" placeholder="Type search keyword..." class="w-full bg-transparent text-white placeholder-gray-500 focus:outline-none text-sm">
+                    <i class="fa-solid fa-magnifying-glass text-suniGold ml-2"></i>
                 </div>
             </div>
-            <!-- Tamu -->
-            <div class="border border-gray-700 bg-black/40 p-3 rounded-lg">
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1">Tamu</label>
-                <div class="flex items-center justify-between text-sm font-semibold">
-                    <span>2 Dewasa, 1 Anak</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-suniGold"></i>
-                </div>
-            </div>
-            <!-- Kamar -->
-            <div class="border border-gray-700 bg-black/40 p-3 rounded-lg">
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-1">Kamar</label>
-                <div class="flex items-center justify-between text-sm font-semibold">
-                    <span>1 Kamar</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-suniGold"></i>
-                </div>
-            </div>
-            <!-- Button Cek Ketersediaan -->
+
+            <!-- Tombol Search -->
             <div>
-                <button class="w-full bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold py-3.5 px-4 rounded-lg text-sm transition shadow-md">
-                    CEK KETERSEDIAAN
+                <button @click="handleSearch()" class="w-full bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold py-4 px-4 rounded-lg text-sm transition shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-search"></i>
+                    <span>SEARCH NOW</span>
                 </button>
             </div>
+
         </div>
     </div>
 
-    <!-- VALUE PROPS / FEATURES ICON BAR -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="flex items-start space-x-4 bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                <div class="text-suniGold text-2xl p-3 bg-yellow-50 rounded-lg">
-                    <i class="fa-solid fa-location-dot"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm mb-1">Lokasi Strategis</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Tepi Danau Sentani, Jayapura - Papua</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4 bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                <div class="text-suniGold text-2xl p-3 bg-yellow-50 rounded-lg">
-                    <i class="fa-solid fa-water-ladder"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm mb-1">Fasilitas Lengkap</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Kolam Renang, Restoran, Meeting Room, & lainnya</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4 bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                <div class="text-suniGold text-2xl p-3 bg-yellow-50 rounded-lg">
-                    <i class="fa-solid fa-concierge-bell"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm mb-1">Pelayanan Terbaik</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Layanan ramah 24/7 untuk kenyamanan Anda</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4 bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                <div class="text-suniGold text-2xl p-3 bg-yellow-50 rounded-lg">
-                    <i class="fa-solid fa-tags"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm mb-1">Harga Terbaik</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Dapatkan harga special hanya di website resmi</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION: PILIHAN KAMAR NYAMAN -->
-    <section id="kamar" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center justify-between mb-6">
+    <!-- ROOMS & SUITES SECTION -->
+    <section id="rooms" x-show="selectedCategory === 'Rooms & Suites'" x-transition class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        x-data="{
+            rooms: [
+                { name: 'Superior Room', guests: '2 Guests', size: '24 m²', price: 'Rp 850,000', image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80&w=600', link: '#kamar-superior' },
+                { name: 'Deluxe Room', guests: '2 Guests', size: '32 m²', price: 'Rp 1,150,000', image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=600', link: '#kamar-deluxe' },
+                { name: 'Executive Room', guests: '2 Guests', size: '38 m²', price: 'Rp 1,450,000', image: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&q=80&w=600', link: '#kamar-executive' },
+                { name: 'Suite Room', guests: '2 Guests', size: '48 m²', price: 'Rp 2,250,000', image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80&w=600', link: '#kamar-presidential' }
+            ]
+        }">
+        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-4 border-b border-gray-200">
             <div>
-                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">KAMAR KAMI</span>
-                <h2 class="text-2xl font-extrabold text-gray-900">Pilihan Kamar Nyaman</h2>
-                <p class="text-xs sm:text-sm text-gray-500">Berbagai pilihan kamar dengan fasilitas lengkap untuk menunjang kenyamanan Anda selama menginap.</p>
+                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">OUR ACCOMMODATION</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-suniDarker tracking-tight">Comfortable Rooms & Suites</h2>
             </div>
-            <a href="#" class="hidden sm:inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded transition">
-                LIHAT SEMUA KAMAR
-            </a>
-        </div>
-
-        <!-- Grid Kamar -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Kamar 1 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80&w=600" alt="Superior Room" class="h-48 w-full object-cover">
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Superior Room</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 2 Tamu</span>
-                        <span><i class="fa-solid fa-expand mr-1 text-suniGold"></i> 24 m²</span>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-sm text-gray-900">Rp 850.000 <span class="text-xs font-normal text-gray-500">/ malam</span></span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
+            <div class="mt-4 sm:mt-0">
+                <a href="#all-rooms" class="inline-flex items-center space-x-2 text-sm font-semibold text-suniGold hover:text-yellow-600 transition">
+                    <span>View All Rooms</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
             </div>
-
-            <!-- Kamar 2 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=600" alt="Deluxe Room" class="h-48 w-full object-cover">
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Deluxe Room</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 2 Tamu</span>
-                        <span><i class="fa-solid fa-expand mr-1 text-suniGold"></i> 32 m²</span>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-sm text-gray-900">Rp 1.150.000 <span class="text-xs font-normal text-gray-500">/ malam</span></span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Kamar 3 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&q=80&w=600" alt="Executive Room" class="h-48 w-full object-cover">
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Executive Room</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 2 Tamu</span>
-                        <span><i class="fa-solid fa-expand mr-1 text-suniGold"></i> 38 m²</span>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-sm text-gray-900">Rp 1.450.000 <span class="text-xs font-normal text-gray-500">/ malam</span></span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Kamar 4 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80&w=600" alt="Suite Room" class="h-48 w-full object-cover">
-                <div class="p-4 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Suite Room</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 2 Tamu</span>
-                        <span><i class="fa-solid fa-expand mr-1 text-suniGold"></i> 48 m²</span>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-sm text-gray-900">Rp 2.250.000 <span class="text-xs font-normal text-gray-500">/ malam</span></span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION: FASILITAS TERBAIK -->
-    <section id="fasilitas" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="mb-6">
-            <span class="text-suniGold text-xs font-bold uppercase tracking-wider">FASILITAS KAMI</span>
-            <h2 class="text-2xl font-extrabold text-gray-900">Nikmati Fasilitas Terbaik</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="relative rounded-xl overflow-hidden shadow-sm group h-56">
-                <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=600" alt="Kolam Renang" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                    <h3 class="text-white font-bold text-sm">Kolam Renang</h3>
+            <template x-for="room in rooms">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
+                    <div class="relative overflow-hidden aspect-[4/3]">
+                        <img :src="room.image" :alt="room.name" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 class="font-bold text-base text-gray-900 mb-2" x-text="room.name"></h3>
+                        <div class="flex items-center space-x-4 text-xs text-gray-500 mb-4">
+                            <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> <span x-text="room.guests"></span></span>
+                            <span><i class="fa-solid fa-expand mr-1 text-suniGold"></i> <span x-text="room.size"></span></span>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="block text-[10px] text-gray-400 uppercase">Starting from</span>
+                                <span class="font-bold text-sm text-gray-900"><span x-text="room.price"></span> <span class="text-xs font-normal text-gray-500">/ night</span></span>
+                            </div>
+                            <a :href="room.link" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
+                                BOOK NOW
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="relative rounded-xl overflow-hidden shadow-sm group h-56">
-                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=600" alt="Restoran" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                    <h3 class="text-white font-bold text-sm">Restoran</h3>
-                </div>
-            </div>
-            <div class="relative rounded-xl overflow-hidden shadow-sm group h-56">
-                <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=600" alt="Taman & Area Terbuka" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                    <h3 class="text-white font-bold text-sm">Taman & Area Terbuka</h3>
-                </div>
-            </div>
-            <div class="relative rounded-xl overflow-hidden shadow-sm group h-56">
-                <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=600" alt="Kamar Nyaman" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                    <h3 class="text-white font-bold text-sm">Kamar Nyaman</h3>
-                </div>
-            </div>
+            </template>
         </div>
     </section>
 
-    <!-- SECTION: PAKET MENGINAP TERBAIK -->
-    <section id="paket" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center justify-between mb-6">
+
+    <!-- MEETING & EVENTS SECTION -->
+    <section id="meeting" x-show="selectedCategory === 'Meeting & Events'" x-transition class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        x-data="{
+            events: [
+                { title: 'Grand Ballroom', desc: 'Spacious venue ideal for large corporate gatherings, grand weddings, and exhibitions.', image: './img/rooms/1.jpg', link: '#ballroom' },
+                { title: 'Conference Room', desc: 'Equipped with state-of-the-art audiovisual tech for professional board meetings and seminars.', image: './img/rooms/2.jpg', link: '#conference-room' },
+                { title: 'Meeting Pod', desc: 'Intimate setting tailored for focused team syncs, interviews, and small discussions.', image: './img/rooms/3.jpg', link: '#meeting-pod' },
+                { title: 'Outdoor Lawn', desc: 'Open-air landscape space perfect for festive social parties, product launches, and gatherings.', image: './img/rooms/4.jpg', link: '#outdoor-venue' }
+            ]
+        }">
+        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-4 border-b border-gray-200">
             <div>
-                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">PAKET SPESIAL</span>
-                <h2 class="text-2xl font-extrabold text-gray-900">Paket Menginap Terbaik</h2>
+                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">VENUES & SPACES</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-suniDarker tracking-tight">Meeting & Events</h2>
             </div>
-            <a href="#" class="hidden sm:inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded transition">
-                LIHAT SEMUA PAKET
-            </a>
+            <div class="mt-4 sm:mt-0">
+                <a href="#all-events" class="inline-flex items-center space-x-2 text-sm font-semibold text-suniGold hover:text-yellow-600 transition">
+                    <span>View All Events</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <template x-for="event in events">
+                <a :href="event.link" class="group bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
+                    <div class="relative overflow-hidden aspect-[4/3]">
+                        <img :src="event.image" :alt="event.title" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-gray-900 group-hover:text-suniGold transition mb-1" x-text="event.title"></h3>
+                            <p class="text-xs text-gray-500 leading-relaxed" x-text="event.desc"></p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-suniGold">
+                            <span>Explore Venue</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </div>
+                    </div>
+                </a>
+            </template>
+        </div>
+    </section>
+
+
+    <!-- SPECIAL OFFERS SECTION (Poster Ratio 4:5 & Seluruh Box adalah Link Detail Tanpa Tombol) -->
+    <section id="packages" x-show="selectedCategory === 'Special Offers'" x-transition class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        x-data="{
+            offers: [
+                { title: '24 Hours Stay', discount: 'Save 20%', desc: 'Comfortable stay with breakfast, swimming pool access, and local Sentani tourism tours.', price: 'Rp 2,500,000', image: './img/promo1.jpg', link: '#offer-family' },
+                { title: 'Roompie', discount: 'Special Rate', desc: 'Romantic ambiance with special room decoration, romantic dinner, and breakfast included.', price: 'Rp 2,750,000', image: './img/promo2.jpg', link: '#offer-honeymoon' },
+                { title: 'School Holiday Special', discount: 'Free Coffee Break', desc: 'Complete meeting room facilities, coffee breaks, lunch, and standard equipment provided.', price: 'Rp 3,500,000', image: './img/promo3.jpg', link: '#offer-meeting' }
+            ]
+        }">
+        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-4 border-b border-gray-200">
+            <div>
+                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">PROMOS & DISCOUNTS</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-suniDarker tracking-tight">Special Offers & Deals</h2>
+            </div>
+            <div class="mt-4 sm:mt-0">
+                <a href="#all-offers" class="inline-flex items-center space-x-2 text-sm font-semibold text-suniGold hover:text-yellow-600 transition">
+                    <span>View All Offers</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <!-- Paket 1 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=600" alt="Paket Liburan Keluarga" class="h-48 w-full object-cover">
-                <div class="p-5 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Paket Liburan Keluarga</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                        <span><i class="fa-regular fa-clock mr-1 text-suniGold"></i> 2 Hari 1 Malam</span>
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 4 Orang</span>
+            <template x-for="offer in offers">
+                <a :href="offer.link" class="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col relative">
+                    <!-- Poster Ratio 4:5 -->
+                    <div class="relative overflow-hidden aspect-[4/5]">
+                        <img :src="offer.image" :alt="offer.title" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-suniGold text-suniDarker text-[10px] font-bold px-2.5 py-1 rounded shadow" x-text="offer.discount"></div>
                     </div>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">
-                        Menginap nyaman dengan sarapan, akses kolam renang, dan wisata sekitar Sentani.
-                    </p>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-base text-gray-900">Rp 2.500.000</span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Paket 2 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=600" alt="Paket Honeymoon" class="h-48 w-full object-cover">
-                <div class="p-5 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Paket Honeymoon</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                        <span><i class="fa-regular fa-clock mr-1 text-suniGold"></i> 2 Hari 1 Malam</span>
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 2 Orang</span>
-                    </div>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">
-                        Suasana romantis dengan dekorasi kamar spesial, makan malam romantis & sarapan.
-                    </p>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-base text-gray-900">Rp 2.750.000</span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Paket 3 -->
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600" alt="Paket Meeting" class="h-48 w-full object-cover">
-                <div class="p-5 flex flex-col flex-grow">
-                    <h3 class="font-bold text-base text-gray-900 mb-2">Paket Meeting</h3>
-                    <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                        <span><i class="fa-regular fa-clock mr-1 text-suniGold"></i> 1 Hari</span>
-                        <span><i class="fa-solid fa-user mr-1 text-suniGold"></i> 10 Orang</span>
-                    </div>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">
-                        Fasilitas meeting room, coffee break, makan siang, dan perlengkapan standar.
-                    </p>
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] text-gray-400 uppercase">Mulai dari</span>
-                            <span class="font-bold text-base text-gray-900">Rp 3.500.000</span>
-                        </div>
-                        <a href="#reservasi" class="bg-suniGold hover:bg-yellow-600 text-suniDarker font-bold text-xs px-3.5 py-2 rounded transition">
-                            PESAN SEKARANG
-                        </a>
-                    </div>
-                </div>
-            </div>
+        
+                </a>
+            </template>
         </div>
     </section>
 
-    <!-- SECTION: PENGALAMAN TAMU (TESTIMONIAL) -->
-    <section class="py-16 bg-cover bg-center relative my-8" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=1920');">
-        <div class="absolute inset-0 bg-suniDarker/80"></div>
-        <div class="relative max-w-4xl mx-auto px-4 text-center text-white">
-            <span class="text-suniGold text-xs font-bold uppercase tracking-wider block mb-2">APA KATA TAMU KAMI</span>
-            <h2 class="text-3xl font-extrabold mb-10">Pengalaman Tamu</h2>
 
-            <div class="bg-white text-gray-800 p-8 rounded-xl shadow-xl max-w-2xl mx-auto text-left relative">
-                <div class="flex items-center space-x-4 mb-4">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Daniel K." class="w-12 h-12 rounded-full object-cover">
-                    <div>
-                        <h4 class="font-bold text-sm">Daniel K.</h4>
-                        <span class="text-xs text-gray-400">Jakarta</span>
-                    </div>
-                    <div class="ml-auto flex text-yellow-400 text-sm">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
+    <!-- FACILITIES & SERVICES SECTION -->
+    <section id="facilities" x-show="selectedCategory === 'Facilities & Services'" x-transition class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        x-data="{
+            facilities: [
+                { title: 'Swimming Pool', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=600' },
+                { title: 'Fine Dining Restaurant', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=600' },
+                { title: 'Garden & Open Space', image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=600' },
+                { title: 'Cozy Lounge Area', image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=600' }
+            ]
+        }">
+        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-4 border-b border-gray-200">
+            <div>
+                <span class="text-suniGold text-xs font-bold uppercase tracking-wider">OUR FACILITIES</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-suniDarker tracking-tight">Enjoy Our Best Facilities</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <template x-for="fac in facilities">
+                <div class="relative rounded-xl overflow-hidden shadow-sm group h-56">
+                    <img :src="fac.image" :alt="fac.title" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
+                        <h3 class="text-white font-bold text-sm" x-text="fac.title"></h3>
                     </div>
                 </div>
-                <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    "Hotel terbaik di Sentani! Pemandangan indah, kamar bersih, pelayanan ramah, sangat recommended."
-                </p>
-            </div>
-
-            <!-- Slider Dots -->
-            <div class="flex justify-center space-x-2 mt-6">
-                <span class="w-2.5 h-2.5 rounded-full bg-suniGold"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-white/40"></span>
-            </div>
+            </template>
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer id="kontak" class="bg-suniDarker text-gray-400 text-xs py-16 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-            <!-- Col 1: Brand info -->
-            <div class="lg:col-span-2 space-y-4">
-                <div class="text-suniGold text-2xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-hotel"></i>
-                    <div class="flex flex-col">
-                        <span class="text-[10px] tracking-widest uppercase text-gray-400 font-semibold">Hotel</span>
-                        <span class="text-lg tracking-wider font-extrabold text-white leading-none">SUNI SENTANI</span>
+</div>
+
+
+
+
+
+
+
+<!-- SECTION: PENGALAMAN TAMU (TESTIMONIAL) DENGAN AUTO SLIDE & 5 CONTOH DATA -->
+<section class="py-16 bg-cover bg-center relative my-8" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=1920');"
+    x-data="{
+        activeSlide: 0,
+        testimonials: [
+            { name: 'Daniel K.', origin: 'Jakarta', rating: 5, comment: 'Hotel terbaik di Sentani! Pemandangan indah, kamar bersih, pelayanan ramah, sangat recommended.', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150' },
+            { name: 'Siti Rahma', origin: 'Jayapura', rating: 5, comment: 'Suasananya sangat nyaman untuk staycation keluarga. Menu sarapannya enak dan bervariasi!', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150' },
+            { name: 'Michael Tan', origin: 'Surabaya', rating: 5, comment: 'Fasilitas ruang meeting sangat mendukung keperluan bisnis saya selama di Papua. Staf sangat profesional.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150' },
+            { name: 'Maria Wenda', origin: 'Wamena', rating: 5, comment: 'Lokasi strategis dekat bandara, pemandangan Danau Sentani dari kamar luar biasa indah!', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150' },
+            { name: 'Budi Santoso', origin: 'Makassar', rating: 5, comment: 'Pelayanan ramah khas Papua yang luar biasa hangat. Pasti akan kembali lagi jika ada tugas ke Sentani.', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150' }
+        ],
+        timer: null,
+        init() {
+            this.timer = setInterval(() => {
+                this.activeSlide = (this.activeSlide + 1) % this.testimonials.length;
+            }, 4000);
+        },
+        stopTimer() {
+            clearInterval(this.timer);
+        }
+    }"
+    @mouseenter="stopTimer()">
+    
+    <div class="absolute inset-0 bg-suniDarker/80"></div>
+    <div class="relative max-w-4xl mx-auto px-4 text-center text-white">
+        <span class="text-suniGold text-5xl font-bold uppercase tracking-wider block mb-7">TESTIMONIALS</span>
+
+        <!-- Slider Container -->
+        <div class="relative overflow-hidden max-w-2xl mx-auto">
+            <template x-for="(item, index) in testimonials" :key="index">
+                <div x-show="activeSlide === index" 
+                    x-transition:enter="transition ease-out duration-500" 
+                    x-transition:enter-start="opacity-0 translate-x-4" 
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-in duration-300"
+                    x-transition:leave-start="opacity-100 translate-x-0"
+                    x-transition:leave-end="opacity-0 -translate-x-4"
+                    class="bg-white text-gray-800 p-8 rounded-xl shadow-xl text-left relative">
+                    
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img :src="item.image" :alt="item.name" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-sm" x-text="item.name"></h4>
+                            <span class="text-xs text-gray-400" x-text="item.origin"></span>
+                        </div>
+                        <div class="ml-auto flex text-yellow-400 text-sm">
+                            <template x-for="i in item.rating">
+                                <i class="fa-solid fa-star"></i>
+                            </template>
+                        </div>
                     </div>
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed" x-text="item.comment"></p>
                 </div>
-                <p class="text-gray-400 text-xs leading-relaxed max-w-sm">
-                    Hotel Suni Sentani adalah pilihan ideal untuk liburan, bisnis, dan acara spesial Anda di tepi Danau Sentani, Jayapura - Papua.
-                </p>
-                <div class="flex space-x-3 text-white">
-                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-facebook-f text-xs"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-instagram text-xs"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-whatsapp text-xs"></i></a>
+            </template>
+        </div>
+
+        <!-- Slider Dots Navigasi -->
+        <div class="flex justify-center space-x-2 mt-6">
+            <template x-for="(item, index) in testimonials" :key="index">
+                <button @click="activeSlide = index" 
+                    class="w-2.5 h-2.5 rounded-full transition-all duration-300" 
+                    :class="activeSlide === index ? 'bg-suniGold w-6' : 'bg-white/40'">
+                </button>
+            </template>
+        </div>
+    </div>
+</section>
+
+
+
+
+<!-- SECTION: LOCATION & GOOGLE MAPS -->
+<section id="location" class="py-16 bg-gray-50 my-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-suniGold text-5xl font-bold uppercase tracking-wider block mb-2">FIND US</span>
+        </div>
+
+        <!-- Content Grid: Info & Map -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            
+            <!-- Information Card -->
+            <div class="bg-white p-8 rounded-xl shadow-lg space-y-6 border-t-4 border-suniGold">
+                <div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-2">Hotel Suni Sentani</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Jl. Raya Sentani Waena-Jayapura, Sentani Kota, Distrik Sentani, Kabupaten Jayapura, Papua 99352
+                    </p>
+                </div>
+
+                <ul class="space-y-4 text-xs text-gray-600">
+                    <li class="flex items-start space-x-3">
+                        <i class="fa-solid fa-plane-departure text-suniGold mt-1 text-sm"></i>
+                        <span>Approx. 10 minutes from Sentani International Airport (DJJ)</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <i class="fa-solid fa-water text-suniGold mt-1 text-sm"></i>
+                        <span>Close proximity to the beautiful Lake Sentani tourism spots</span>
+                    </li>
+                    <li class="flex items-start space-x-3">
+                        <i class="fa-solid fa-car text-suniGold mt-1 text-sm"></i>
+                        <span>Free spacious parking area available for guests</span>
+                    </li>
+                </ul>
+
+                <div>
+                    <a href="https://maps.google.com/?q=Hotel+Suni+Sentani+Jayapura" target="_blank" rel="noopener noreferrer" 
+                        class="w-full inline-block text-center bg-suniDarker text-white text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-lg hover:bg-suniGold hover:text-suniDarker transition duration-300">
+                        <i class="fa-solid fa-directions mr-2"></i> Get Directions
+                    </a>
                 </div>
             </div>
 
-            <!-- Col 2: Menu -->
-            <div>
-                <h4 class="text-white font-bold uppercase tracking-wider mb-4 text-sm">MENU</h4>
-                <ul class="space-y-2.5">
-                    <li><a href="#beranda" class="hover:text-suniGold transition">Beranda</a></li>
-                    <li><a href="#kamar" class="hover:text-suniGold transition">Kamar</a></li>
-                    <li><a href="#fasilitas" class="hover:text-suniGold transition">Fasilitas</a></li>
-                    <li><a href="#paket" class="hover:text-suniGold transition">Paket</a></li>
-                    <li><a href="#galeri" class="hover:text-suniGold transition">Galeri</a></li>
-                    <li><a href="#tentang" class="hover:text-suniGold transition">Tentang Kami</a></li>
-                    <li><a href="#kontak" class="hover:text-suniGold transition">Kontak</a></li>
-                </ul>
+            <!-- Google Maps Embed -->
+            <div class="lg:col-span-2 h-[400px] w-full rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4297.190450734848!2d140.53295917496905!3d-2.5717112974064595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x686cf15c2f38baf5%3A0x18fc7a4a1035d3f1!2sHotel%20Suni%20Sentani!5e1!3m2!1sid!2sid!4v1787305667453!5m2!1sid!2sid" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Hotel Suni Sentani Map Location">
+                </iframe>
+
+              
             </div>
 
-            <!-- Col 3: Informasi -->
-            <div>
-                <h4 class="text-white font-bold uppercase tracking-wider mb-4 text-sm">INFORMASI</h4>
-                <ul class="space-y-2.5">
-                    <li><a href="#" class="hover:text-suniGold transition">Tentang Kami</a></li>
-                    <li><a href="#" class="hover:text-suniGold transition">Kebijakan Privasi</a></li>
-                    <li><a href="#" class="hover:text-suniGold transition">Syarat & Ketentuan</a></li>
-                    <li><a href="#" class="hover:text-suniGold transition">FAQ</a></li>
-                    <li><a href="#" class="hover:text-suniGold transition">Karir</a></li>
-                </ul>
-            </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Col 4: Kontak Kami -->
-            <div>
-                <h4 class="text-white font-bold uppercase tracking-wider mb-4 text-sm">KONTAK KAMI</h4>
-                <ul class="space-y-3">
-                    <li class="flex items-start space-x-2">
-                        <i class="fa-solid fa-location-dot text-suniGold mt-0.5"></i>
-                        <span>Jl. Raya Sentani, Danau Sentani Jayapura, Papua.</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-phone text-suniGold"></i>
-                        <span>+62 960 1224 567</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-envelope text-suniGold"></i>
-                        <span>info@hotelsunisentani.com</span>
-                    </li>
-                </ul>
+
+
+
+
+<!-- FOOTER -->
+<footer id="contact" class="bg-suniDarker text-gray-400 text-xs py-16 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        
+        <!-- Col 1: Brand Info & Logo -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="flex items-center gap-3">
+                <!-- Ganti path src dengan file logo Anda -->
+                <img src="./img/logo.png" alt="Hotel Suni Sentani Logo" class="h-32 w-auto object-contain">
+            </div>
+            <p class="text-gray-400 text-xs leading-relaxed max-w-sm">
+                Hotel Suni Sentani is your ideal choice for leisure, business trips, and special events by the shores of Lake Sentani, Jayapura - Papua.
+            </p>
+            <div class="flex space-x-3 text-white">
+                <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-facebook-f text-xs"></i></a>
+                <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-instagram text-xs"></i></a>
+                <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-suniGold hover:text-suniDarker transition"><i class="fa-brands fa-whatsapp text-xs"></i></a>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-[11px]">
-            &copy; 2026 Hotel Suni Sentani. All rights reserved.
+        <!-- Col 2: Navigation Menu -->
+        <div>
+            <h4 class="text-suniGold font-bold uppercase tracking-wider mb-4 text-sm">NAVIGATION</h4>
+            <ul class="space-y-2.5">
+                <li><a href="#home" class="hover:text-suniGold transition">Home</a></li>
+                <li><a href="#rooms" class="hover:text-suniGold transition">Rooms</a></li>
+                <li><a href="#facilities" class="hover:text-suniGold transition">Facilities</a></li>
+                <li><a href="#packages" class="hover:text-suniGold transition">Special Offers</a></li>
+                <li><a href="#gallery" class="hover:text-suniGold transition">Gallery</a></li>
+                <li><a href="#about" class="hover:text-suniGold transition">About Us</a></li>
+                <li><a href="#contact" class="hover:text-suniGold transition">Contact</a></li>
+            </ul>
         </div>
-    </footer>
 
+        <!-- Col 3: Information -->
+        <div>
+            <h4 class="text-suniGold font-bold uppercase tracking-wider mb-4 text-sm">INFORMATION</h4>
+            <ul class="space-y-2.5">
+                <li><a href="#about" class="hover:text-suniGold transition">About Us</a></li>
+                <li><a href="#privacy" class="hover:text-suniGold transition">Privacy Policy</a></li>
+                <li><a href="#terms" class="hover:text-suniGold transition">Terms & Conditions</a></li>
+                <li><a href="#faq" class="hover:text-suniGold transition">FAQ</a></li>
+                <li><a href="#careers" class="hover:text-suniGold transition">Careers</a></li>
+            </ul>
+        </div>
+
+        <!-- Col 4: Contact Us -->
+        <div>
+            <h4 class="text-suniGold font-bold uppercase tracking-wider mb-4 text-sm">CONTACT US</h4>
+            <ul class="space-y-3">
+                <li class="flex items-start space-x-2">
+                    <i class="fa-solid fa-location-dot text-suniGold mt-0.5"></i>
+                    <span>Jl. Raya Sentani, Danau Sentani Jayapura, Papua.</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <i class="fa-solid fa-phone text-suniGold"></i>
+                    <span>+62 960 1224 567</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <i class="fa-solid fa-envelope text-suniGold"></i>
+                    <span>info@hotelsunisentani.com</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-gray-800 text-center text-gray-500">
+        &copy; 2026 Hotel Suni Sentani. All rights reserved. 
+        <p class="py-3">
+            This website is only a demo by <a href="https://nokensoft.com" target="_blank" class="text-suniGold hover:text-gray-300">Nokensoft.com</a>
+        </p>
+    </div>
+</footer>
 </body>
 </html>
